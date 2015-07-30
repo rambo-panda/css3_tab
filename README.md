@@ -1,6 +1,14 @@
 # css3_tab
 Css3 Tab选项卡
 
+ 通过css3 `:checked` `:target` 相结合来达到`Tab选项卡效果`!
+
+
+##注意点
+
+*  在**Chrome/44.0.2403.125** `:target` 在刷新页面的时候，如果页面存在 `<script>`  则 `:target` **失效**。 这就是JavaScript中为什么加一个 `refresh`  貌似只在`chrome && version < 44`上看到这个问题  Chrome/46.0.2471.0  已经没有这个问题
+*  需要注意在没有 `location.hash` 以及 `location.hash` 不在合法范围的时候该怎么处理？
+
 #### Html 结构
 ``` html
 <div class="tab_dom">
@@ -48,10 +56,10 @@ Css3 Tab选项卡
 	}
 
 	.tab_content{
-		display : none;
+		display : none !important;
 
 		&:target{
-			display : block;
+			display : block !important;
 		}
 	}
 
@@ -70,23 +78,21 @@ $(function(){
 				}).toArray(),
 				default_hash = 'aaa';
 
-			var hash_change = function(event, refresh){
+			var hash_change = function(event){
 
 				var hash = win.location.hash.replace('#', '');
 
-				if(allow_hash.indexOf(hash) === -1 || !hash){
-					hash = default_hash;
+				if(allow_hash.indexOf(hash) === -1){
+					location.hash=default_hash;
+					return;
 				}
 
 				$('.tab_label .do_' + hash).trigger('click');
 
-				refresh && $('#'+hash).show();
-
 			};
 
-			$(win).bind('hashchange', hash_change);
+			$(win).bind('hashchange', hash_change).trigger('hashchange');
 
-			hash_change(null, true);
 		});
 
 	})();
